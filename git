@@ -1,0 +1,4 @@
+[main bdcf7fc] [Done] Connect UI to Backend and fetchall data inventory
+ 5 files changed, 188 insertions(+), 164 deletions(-)
+ rewrite __pycache__/src.cpython-39.pyc (89%)
+ rewrite dashboard.py (91%)

@@ -29,7 +29,7 @@ if (selInv =="All"):
         ['Obat Cair', 'Obat Kapsul', 'Obat Tablet',
         'Obat Oles', 'Obat Suppositoria', 'Obat Tetes'
         'Obat Inhaler', 'Obat Suntik', 'Obat Implan'], ['Obat Cair', 'Obat Tablet'])
-    selBy = src.orderBy(order)
+    selBy = src.orderByDrugs(order)
     st.table(selBy)
     
         

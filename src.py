@@ -26,7 +26,7 @@ def likeSrcIven(columns = "name", like ='p'):
     myDb.close()
     return df
 
-def likeSrcStaff(columns = "username", like ='p'):
+def likeSrcStaff(columns, like):
     list = []
     myDb = connecntionDb()
     cur = myDb.cursor()
@@ -119,8 +119,8 @@ def selectAllStaff():
     myDb.close()
     return df
 
-#DONE
-def categoryDrugs(category = 'Obat Kapsul'):
+
+def categoryDrugs(category='Obat Kapsul'):
     list = []
     key = []
     value = []
@@ -132,8 +132,38 @@ def categoryDrugs(category = 'Obat Kapsul'):
     records = cur.fetchall()
     for row in records:
         list.append(row)
-            
+
     print(len(list))
+
+    for i in range(len(list)):
+        for j in range(2):
+            if j == 0:
+                key.append(list[i][j])
+            if j == 1:
+                value.append(list[i][j])
+
+    category_dict = dict(zip(value, key))
+    categoryId = category_dict.get(category)
+    cur.close()
+    myDb.close()
+    print(type(categoryId))
+    return categoryId
+
+#DONE
+def occStaff(position):
+    list = []
+    key = []
+    value = []
+    myDb = connecntionDb()
+    cur = myDb.cursor()
+    addCategory = ("""select id, position from occupation;
+    """)
+    cur.execute(addCategory)
+    records = cur.fetchall()
+    for row in records:
+        list.append(row)
+            
+    # print(len(list))
 
     for i in range (len(list)):
         for j in range(2):
@@ -142,12 +172,63 @@ def categoryDrugs(category = 'Obat Kapsul'):
             if j == 1:
                 value.append(list[i][j])
 
-    category_dict = dict(zip(value,key))
-    categoryId = category_dict.get(category)
+    occ_dict = dict(zip(value,key))
+    occId = occ_dict.get(position)
     cur.close()
     myDb.close()
-    print(type(categoryId))
-    return categoryId
+    # print(type(categoryId))
+    return occId
+
+#Done
+def insertStaff(username, gender, email, password, position):
+    # key= []
+    # value = []
+    myDb = connecntionDb()
+    cur = myDb.cursor()
+    # print(category)
+    # print(type(category))
+    occId = str(occStaff(position))
+    addInsert = ('insert into staff'
+                 '(username, gender, email, password, occupation_id)'
+                 'values (%s, %s, %s, %s, %s);')
+    data = (username, gender, email, password,occId)
+    # query = """insert into drugs (name, exp_date, price, stock, category_id)
+    #         values ({},{},{},{},{});""".format(name, date(expDate), price, stock, categoryId)
+    cur.execute(addInsert, data)
+
+    myDb.commit()
+    cur.close()
+    myDb.close()
+
+
+def updateStaff(username, gender, email, password, position, idStaff):
+    myDb = connecntionDb()
+    cur = myDb.cursor()
+    occId = str(occStaff(position))
+    # , gender = %s, email = %s, password = %s, occupation_id = %s
+    addStaff = ("UPDATE staff SET"
+                "username=%s, gender=%s, email=%s, password=%s, occupation_id=%s"
+                'WHERE id=%s'
+                )
+    data = (username, gender, email, password, occId, idStaff)
+    # query = """update staff set username = {}, gender = {}, email = {}, password = {}, occupation_id = {}
+    # where id == {};""".format(username, gender, email, password, occId, idStaff)
+    cur.execute(addStaff,data)
+
+    myDb.commit()
+    cur.close()
+    myDb.close()
+
+
+def delData(columns, id):
+    # list = []
+    myDb = connecntionDb()
+    cur = myDb.cursor()
+    delQuery = ('delete from {} where id = {};').format(columns, id)
+    cur.execute(delQuery)
+    myDb.commit()
+    cur.close()
+    myDb.close()
 
 #DONE
 def insertInv(name,yy,dd,mm,price, stock, category):
@@ -155,8 +236,8 @@ def insertInv(name,yy,dd,mm,price, stock, category):
     # value = []
     myDb = connecntionDb()
     cur = myDb.cursor()
-    print(category)
-    print(type(category))
+    # print(category)
+    # print(type(category))
     categoryId = str(categoryDrugs(category))
     addInsert = ('insert into drugs'
                  '(name, exp_date, price, stock, category_id)'
@@ -189,7 +270,7 @@ def updateInv(id, name, yy,mm,dd, price, stock, category):
 
 #DONE
 def delData(columns, id):
-    list = []
+    # list = []
     myDb = connecntionDb()
     cur = myDb.cursor()
     delQuery = ('delete from {} where id = {};').format(columns,id)
@@ -323,7 +404,7 @@ FROM history_sales;"""
     return df
 
 #DONE
-def orderBy(order):
+def orderByDrugs(order):
     list = []
     myDb = connecntionDb()
     cur = myDb.cursor()
@@ -342,7 +423,27 @@ WHERE category_drugs.category IN {} ORDER BY category_drugs.id;""".format(tuple(
     myDb.close()
     return df
 
-if __name__ == '__main__':
+
+def orderByStaff(order):
+    list = []
+    myDb = connecntionDb()
+    cur = myDb.cursor()
+
+    query = """select staff.id, staff.username, staff.gender, staff.email,  staff.password, occupation.position
+                  from staff
+                  inner join occupation on occupation.id=staff.occupation_id
+                  WHERE occupation.position IN {} ORDER BY occupation.id;""".format(tuple(order))
+    cur.execute(query)
+    records = cur.fetchall()
+    for row in records:
+        list.append(row)
+
+    df = pd.DataFrame(
+        list, columns=["Id","Username", "Gender", "Email", "Pass", "Posisiton"])
+    cur.close()
+    myDb.close()
+    return df
+# if __name__ == '__main__':
 # #     print(likeSrcIven())
 # #     print(betweenSrcIven())
 # #     print(stockCalculation())
@@ -357,4 +458,9 @@ if __name__ == '__main__':
     # print(sumDrugs())
     # insertInv('Sanmol', (2000,1,1),'15000','15','Obat Kapsul')
     # categoryDrugs()
-    print(selectAllStaff())
+    # print(selectAllStaff())
+    # print(occStaff('admin'))
+    # insertStaff('prawangsa','L','wca.waca@gmail.com','30032002','staff frontline')
+    # updateStaff('prawangsa','L','wca.waca@gmail.com','30032002','staff frontline')
+    # delData('staff',5)
+    # print(likeSrcStaff('username','z'))

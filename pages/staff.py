@@ -14,28 +14,31 @@ st.set_page_config(
 
 st.markdown("<h1 style='text-align: center;'>Staff Data</h1>",
             unsafe_allow_html=True)
-selInv = som.option_menu(
+selStaff = som.option_menu(
     menu_title=None,
     options=["All", "Search", "Insert", "Update","Delete"],
     icons=['list', 'search','arrow-down-square','arrow-up-square', 'x-square'],
     menu_icon=None,
     default_index=0,
     orientation='horizontal')
-if (selInv == "All"):
-    selAll = src.selectAllStaff()
-    st.table(selAll)
 
-elif (selInv == "Search"):
+if (selStaff == "All"):
+    order = st.multiselect('Order By',
+                           ['admin','staff frontline','staff warehouse'],['admin','staff frontline'])
+    selBy = src.orderByStaff(order)
+    st.table(selBy)
+
+elif (selStaff == "Search"):
     # st.markdown("<h1 style='text-align: center;'>Inventory</h1>",
     # unsafe_allow_html=True)
     with st.container():
-        with st.form(key='search-bar', clear_on_submit=False):
+        with st.form(key='search-bar-staff', clear_on_submit=False):
             # st.markdown("<p style='text-align: left;'>Inventory</p>",
             #             unsafe_allow_html=True)
             nav1, nav2, nav3 = st.columns([1, 3, 0.5])
             with nav1:
                 optionBar = st.selectbox(
-                    label='Options', options=['name', 'category'])
+                    label='Options', options=['username','position'])
             with nav2:
                 searchBar = st.text_input(label='Values', value="search")
             with nav3:
@@ -58,19 +61,72 @@ elif (selInv == "Search"):
                     searchBar, optionBar))
                 st.table(dfSearch)
 
-elif (selInv == "Insert"):
+elif (selStaff == "Insert"):
     # st.markdown("<h1 style='text-align: center;'>Inventory</h1>",
     # unsafe_allow_html=True)
     with st.container():
-        with st.form(key='search-bar', clear_on_submit=False):
+        with st.form(key='insert-bar-staff', clear_on_submit=False):
             # st.markdown("<p style='text-align: left;'>Inventory</p>",
             #             unsafe_allow_html=True)
+            nav1, nav2, nav3 ,nav4,nav5,nav6= st.columns([1, 1, 1,1,1,0.5])
+            with nav1:
+                occBar = st.selectbox(label='Position', options=['admin','staff warehouse','staff frontline'])
+            with nav2:
+                nameBar = st.text_input(label='Username')
+            with nav3:
+                genBar = st.selectbox(label='Gender', options=['L','P'])
+            with nav4:
+                emailBar = st.text_input(label='Email',value='@gmail.com')
+            with nav5:
+                passBar = st.text_input(label='Password')
+            with nav6:
+                st.text('Submit')
+                submitBar = st.form_submit_button(label='Do')
+                src.insertStaff(nameBar,genBar,emailBar,passBar,occBar)
+elif (selStaff == "Update"):
+    # st.markdown("<h1 style='text-align: center;'>Inventory</h1>",
+    # unsafe_allow_html=True)
+    with st.container():
+        with st.form(key='insert-bar-staff', clear_on_submit=False):
+            # st.markdown("<p style='text-align: left;'>Inventory</p>",
+            #             unsafe_allow_html=True)
+            nav1, nav2, nav3, nav4, nav5, nav6, nav7 = st.columns(
+                [1, 1, 1, 1, 1, 1,0.5])
+            with nav1:
+                idBar = st.text_input(label='Id Staff')
+            with nav2:
+                occBar = st.selectbox(label='Position', options=[
+                                      'admin', 'staff warehouse', 'staff frontline'])
+            with nav3:
+                nameBar = st.text_input(label='Username')
+            with nav4:
+                genBar = st.selectbox(label='Gender', options=['L', 'P'])
+            with nav5:
+                emailBar = st.text_input(label='Email', value='@gmail.com')
+            with nav6:
+                passBar = st.text_input(label='Password')
+            with nav7:
+                st.text('Submit')
+                submitBar = st.form_submit_button(label='Do')
+        if submitBar:
+            src.updateStaff(nameBar,genBar,emailBar,passBar,occBar,idBar)
+
+elif (selStaff == 'Delete'):
+    selAll = src.selectAllStaff()
+    st.table(selAll)
+    target = 'staff'
+    with st.container():
+        with st.form(key='del-bar-staff', clear_on_submit=False):
+                # st.markdown("<p style='text-align: left;'>Inventory</p>",
+                #             unsafe_allow_html=True)
             nav1, nav2, nav3 = st.columns([1, 3, 0.5])
             with nav1:
                 optionBar = st.selectbox(
-                    label='Options', options=['name', 'category'])
+                    label='Options', options=['id'])
             with nav2:
-                searchBar = st.text_input(label='Values', value="search")
+                delBar = st.text_input(label='Values')
             with nav3:
-                st.text('Search')
+                st.text('Delete')
                 submitBar = st.form_submit_button(label='Do')
+        if submitBar:
+            src.delData(target, int(delBar))
