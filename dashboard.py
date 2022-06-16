@@ -7,10 +7,9 @@ import pandas as pd
 import matplotlib as plt
 import numpy as np
 import src
-# from PIL import Image
-# img = Image.open("")
-# st.markdown("# Report")
-st.sidebar.markdown("<h1>Dashboard</h1>",unsafe_allow_html=True)
+
+st.markdown("<h1 style='text-align: center;'>Report</h1> <br><br>",
+            unsafe_allow_html=True)
 with st.container():
     col1, col2, col3 = st.columns(3)
     with col1:
@@ -20,6 +19,8 @@ with st.container():
     with col3:
         st.metric(label=" Stock Drugs ", value = src.countDrugs(), delta = 0)
 with st.container():
+    st.markdown("<h3 style='text-align: left;'>History Sell/Buy</h3>",
+            unsafe_allow_html=True)
     st.table(src.viewTransaction())
 with st.container():
     nav1,nav2= st.columns(2)
@@ -27,12 +28,3 @@ with st.container():
         st.metric(label='Suplied Drugs', value=src.countQuantity(), delta=0)
     with nav2:
         st.metric(label='Expired Drugs', value=src.countExp(), delta=0)
-
-# selected = som.option_menu(
-#     menu_title=None,
-#     options=["Report", "Inventory", "Cashier", "Staff", "Search"],
-#     icons=['bar-chart-line-fill', 'box-seam',
-#         'cash', 'person-lines-fill', 'house'],
-#     menu_icon=None,
-#     default_index=0,
-#     orientation='horizontal')

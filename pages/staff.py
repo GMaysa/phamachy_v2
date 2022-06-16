@@ -1,4 +1,5 @@
 from turtle import ScrolledCanvas
+from unicodedata import name
 from pyrsistent import s
 import streamlit as st
 import streamlit_option_menu as som
@@ -82,7 +83,11 @@ elif (selStaff == "Insert"):
             with nav6:
                 st.text('Submit')
                 submitBar = st.form_submit_button(label='Do')
-                src.insertStaff(nameBar,genBar,emailBar,passBar,occBar)
+        if submitBar == True and (occBar == '', nameBar =='',genBar=='', emailBar=='',passBar=='' ):
+            st.error("There aren't input a data")
+        elif submitBar:
+            src.insertStaff(nameBar,genBar,emailBar,passBar,occBar)
+
 elif (selStaff == "Update"):
     # st.markdown("<h1 style='text-align: center;'>Inventory</h1>",
     # unsafe_allow_html=True)
@@ -108,7 +113,9 @@ elif (selStaff == "Update"):
             with nav7:
                 st.text('Submit')
                 submitBar = st.form_submit_button(label='Do')
-        if submitBar:
+        if submitBar == True and (occBar == '', nameBar =='',genBar=='', emailBar=='',passBar=='' ):
+            st.error("There aren't input a data")
+        elif submitBar:
             src.updateStaff(nameBar,genBar,emailBar,passBar,occBar,idBar)
 
 elif (selStaff == 'Delete'):
