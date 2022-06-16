@@ -12,18 +12,17 @@ st.set_page_config(
     page_icon=icon,
 )
 
-st.markdown("<h1 style='text-align: center;'>Inventory</h1>",
+st.markdown("<h1 style='text-align: center;'>Staff Data</h1>",
             unsafe_allow_html=True)
 selInv = som.option_menu(
     menu_title=None,
-    options=["All", "Search", "Range", "Insert", "Delete"],
-    icons=['list', 'search',
-           'filter', 'arrow-down-square', 'x-square'],
+    options=["All", "Search", "Insert", "Update","Delete"],
+    icons=['list', 'search','arrow-down-square','arrow-up-square', 'x-square'],
     menu_icon=None,
     default_index=0,
     orientation='horizontal')
 if (selInv == "All"):
-    selAll = src.selectAll()
+    selAll = src.selectAllStaff()
     st.table(selAll)
 
 elif (selInv == "Search"):
@@ -46,7 +45,7 @@ elif (selInv == "Search"):
             st.error("There aren't input a data")
         elif submitBar:
             try:
-                dfSearch = src.likeSrcIven(optionBar, searchBar)
+                dfSearch = src.likeSrcStaff(optionBar, searchBar)
             except ValueError:
                 if optionBar == "id":
                     try:
@@ -54,12 +53,12 @@ elif (selInv == "Search"):
                     except:
                         st.error("You only can search a Book ID using a number")
             else:
-                dfSearch = src.likeSrcIven(optionBar, searchBar)
+                dfSearch = src.likeSrcStaff(optionBar, searchBar)
                 st.success("Your searched for {} in {}".format(
                     searchBar, optionBar))
                 st.table(dfSearch)
 
-elif (selInv == "Filter"):
+elif (selInv == "Insert"):
     # st.markdown("<h1 style='text-align: center;'>Inventory</h1>",
     # unsafe_allow_html=True)
     with st.container():

@@ -26,6 +26,24 @@ def likeSrcIven(columns = "name", like ='p'):
     myDb.close()
     return df
 
+def likeSrcStaff(columns = "username", like ='p'):
+    list = []
+    myDb = connecntionDb()
+    cur = myDb.cursor()
+    query = """select staff.username, staff.gender, staff.email,  staff.password, occupation.position
+                  from staff
+                  inner join occupation on occupation.id=staff.occupation_id;
+                  where {} like '%{}%'""".format(columns,like)
+    cur.execute(query)
+    records = cur.fetchall()
+    for row in records:
+        list.append(row)
+    
+    df = pd.DataFrame(
+        list, columns=["Username", "Gender", "Email", "Pass", "Posisiton"])
+    cur.close()
+    myDb.close()
+    return df
 #DONE
 def betweenSrcIven(columns = "price", start = 0, end = 1000000):
     list = []
@@ -65,7 +83,7 @@ def stockCalculation(columns='drugs'):
 
 
 #DONE
-def selectAllInventory():
+def selectAllInv():
     list = []
     myDb = connecntionDb()
     cur = myDb.cursor()
@@ -82,8 +100,28 @@ def selectAllInventory():
     myDb.close()
     return df
 
+# Done
+def selectAllStaff():
+    list = []
+    myDb = connecntionDb()
+    cur = myDb.cursor()
+    query = """select staff.id, staff.username, staff.gender, staff.email,  staff.password, occupation.position
+                  from staff
+                  inner join occupation on occupation.id=staff.occupation_id;"""
+    cur.execute(query)
+    records = cur.fetchall()
+    for row in records:
+        list.append(row)
+
+    df = pd.DataFrame(
+        list, columns=["Id", "Username", "Gender", "Email", "Pass", "Posisiton"])
+    cur.close()
+    myDb.close()
+    return df
+
 #DONE
-def categoryDrugs(category):
+def categoryDrugs(category = 'Obat Kapsul'):
+    list = []
     key = []
     value = []
     myDb = connecntionDb()
@@ -108,21 +146,24 @@ def categoryDrugs(category):
     categoryId = category_dict.get(category)
     cur.close()
     myDb.close()
+    print(type(categoryId))
     return categoryId
 
 #DONE
-def insertInv(name,expDate,price, stock, category):
-    key= []
-    value = []
+def insertInv(name,yy,dd,mm,price, stock, category):
+    # key= []
+    # value = []
     myDb = connecntionDb()
     cur = myDb.cursor()
-    categoryId = categoryDrugs(category)
+    print(category)
+    print(type(category))
+    categoryId = str(categoryDrugs(category))
     addInsert = ('insert into drugs'
                  '(name, exp_date, price, stock, category_id)'
                  'values (%s, %s, %s, %s, %s);')
-    data = (name, date(expDate), price, stock, categoryId)
+    data = (name, date(yy,dd,mm), price, stock, categoryId)
     # query = """insert into drugs (name, exp_date, price, stock, category_id)
-    #         values ({},{},{},{},{});""".format(name, expDate, price, stock, categoryId)
+    #         values ({},{},{},{},{});""".format(name, date(expDate), price, stock, categoryId)
     cur.execute(addInsert,data)
 
     myDb.commit()
@@ -130,14 +171,14 @@ def insertInv(name,expDate,price, stock, category):
     myDb.close()
 
 #DONE
-def updateInv(id, name, expDate, price, stock, category):
+def updateInv(id, name, yy,mm,dd, price, stock, category):
     myDb = connecntionDb()
     cur = myDb.cursor()
     categoryId = categoryDrugs(category)
     addUpdate = ('update drugs set'
                  "name= %s, exp_date=%s, price=%s, stock=%s, category_id=%s"
                  'where id = %s')
-    data = (name, date(expDate), price, stock, categoryId, id)
+    data = (name, date(yy,mm,dd), price, stock, categoryId, id)
     # query = """insert into drugs (name, exp_date, price, stock, category_id)
     #         values ({},{},{},{},{});""".format(name, expDate, price, stock, categoryId)
     cur.execute(addUpdate,data)
@@ -151,11 +192,9 @@ def delData(columns, id):
     list = []
     myDb = connecntionDb()
     cur = myDb.cursor()
-    delData = ('delete from %s'
-            'where id = %s')
-    data = (columns, id)
-    cur.execute(delData,data)
-    myDb.commint()
+    delQuery = ('delete from {} where id = {};').format(columns,id)
+    cur.execute(delQuery)
+    myDb.commit()
     cur.close()
     myDb.close()
 
@@ -216,7 +255,7 @@ month(now())"""
     myDb.close()
     res = list[0]
 
-    return res
+    return int(res)
 
 # DONE
 def countDrugs():
@@ -312,8 +351,10 @@ if __name__ == '__main__':
     # print(viewTransaction())
     # order = ['Obat Sirup', 'Obat Tablet']
     # print(orderBy(order))
-    print(countDrugs())
-    print(countExp())
-    print(countQuantity())
-    print(sumDrugs())
-
+    # print(countDrugs())
+    # print(countExp())
+    # print(countQuantity())
+    # print(sumDrugs())
+    # insertInv('Sanmol', (2000,1,1),'15000','15','Obat Kapsul')
+    # categoryDrugs()
+    print(selectAllStaff())
